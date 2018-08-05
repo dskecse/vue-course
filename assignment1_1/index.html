@@ -57,9 +57,9 @@
         </thead>
 
         <tbody>
-          <tr v-for="(user, index) in users" :key="user.id">
+          <tr v-for="user in users" :key="user.id">
             <td>
-              <img :src="imageUrl(index)" alt="avatar">
+              <img :src="user.imageUrl || defaultImageUrl" alt="avatar">
             </td>
             <td>{{ user.firstName }}</td>
             <td>{{ user.lastName }}</td>
@@ -124,9 +124,6 @@
           }
         },
         methods: {
-          imageUrl(index) {
-            return this.users[index].imageUrl || this.defaultImageUrl
-          },
           toggleUsersDisplay() {
             this.displayUsers = !this.displayUsers
           }
