@@ -1,2 +1,3 @@
 # vue-course
-Vue.js Course
+
+Vue.js Course Lessons and Assignments

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+
+      .red {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Первое занятие по Vue!</h1>
+
+    <div id="app" v-cloak>
+      <p :title="tooltip" class="static" :class="testClass">
+        {{ temp }}
+      </p>
+
+      <p v-once>
+        {{ temp }}
+      </p>
+
+      <p v-text="temp"></p>
+
+      <p v-html="testHtml">
+        <!-- {{ temp }} -->
+      </p>
+
+      <div v-if="condition">Conditional text: if true</div>
+      <div v-else>If false</div>
+
+      <div v-show="condition">Not displayed but present in DOM</div>
+
+      <div v-for="(item, index) in users" :key="item.title">
+        ({{ index }}) {{ item.title }}
+      </div>
+
+      <!-- <button type="button" @click="change($event)"></button> -->
+      <button type="button" @click="change">
+        Set temp
+      </button>
+
+      <!-- <input type="text" :value="temp" @input="changeTemp"> -->
+      <input type="text" v-model="temp">  <!-- syntactic sugar!!! -->
+    </div>
+    <!-- <div id="template">
+      <p>Hello Claa</p>
+    </div> -->
+
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <script>
+      // window.app = new Vue({
+      const app = new Vue({
+        el: "#app",
+        // template: "#template",
+        data() {
+          return {
+            temp: "Тестовая строка",
+            tooltip: "I'M A HINT",
+            condition: false,
+            users: [],
+            testHtml: "<p><strong>booyah</strong></p>",
+            testClass: "red"
+          }
+        },
+        mounted() {
+          this.users = [
+            { title: "123" },
+            { title: "456" },
+            { title: "789" },
+            { title: "000" }
+          ]
+        },
+        methods: {
+          change() {
+            // Trigger app.change() in the browser console !!
+            this.temp = "`change` function called"
+          },
+          changeTemp(event) {
+            this.temp = event.target.value
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
