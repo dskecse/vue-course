@@ -88,20 +88,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="(user, index) in users" :key="user.id">
-            <td>
-              <img :src="user.imageUrl || defaultImageUrl" alt="avatar">
-            </td>
-            <td>{{ user.firstName | uppercase }}</td>
-            <td>{{ user.lastName | uppercase }}</td>
-            <td>{{ user.patronymicName | uppercase }}</td>
-            <td>
-              <button v-copy="fullName(user)" v-copy:callback="handleCopied.bind(this, index)" type="button">
-                Copy
-              </button>
-              <span v-if="nameCopied(index)">Copied!</span>
-            </td>
-          </tr>
+          <User v-for="user in users" :key="user.id" :user="user"></User>
         </tbody>
       </table>
     </div>
@@ -109,7 +96,54 @@
     <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
     <script src="https://unpkg.com/v-copy"></script>
     <script src="https://unpkg.com/v-tooltip"></script>
+    <script type="text/x-template" id="user-template">
+      <tr>
+        <td>
+          <img :src="user.imageUrl || defaultImageUrl" alt="avatar">
+        </td>
+        <td>{{ user.firstName | uppercase }}</td>
+        <td>{{ user.lastName | uppercase }}</td>
+        <td>{{ user.patronymicName | uppercase }}</td>
+        <td>
+          <button v-copy="fullName" v-copy:callback="handleCopied" type="button">
+            Copy
+          </button>
+          <span v-show="nameCopied">Copied!</span>
+        </td>
+      </tr>
+    </script>
     <script>
+      const user = Vue.component("user", {
+        template: "#user-template",
+        props: {
+          user: {
+            required: true
+          }
+        },
+        data() {
+          return {
+            nameCopied: false,
+            defaultImageUrl: "../assets/default.png"
+          }
+        },
+        filters: {
+          uppercase(value) {
+            return value.toUpperCase()
+          }
+        },
+        computed: {
+          fullName() {
+            return `${this.user.lastName} ${this.user.firstName} ${this.user.patronymicName}`
+          }
+        },
+        methods: {
+          handleCopied(text) {
+            this.nameCopied = true
+            setTimeout(() => this.nameCopied = false, 1000)
+          }
+        }
+      })
+
       const app = new Vue({
         el: "#app",
         data: {
@@ -120,43 +154,37 @@
               firstName: "Russ",
               lastName: "Hanneman",
               patronymicName: "Ivanovich",
-              imageUrl: "../assets/russ_hanneman.png",
-              nameCopied: false
+              imageUrl: "../assets/russ_hanneman.png"
             },
             {
               id: "203b8246-2772-45e0-aa38-9bf7304b489a",
               firstName: "Richard",
               lastName: "Hendricks",
               patronymicName: "Igorevich",
-              imageUrl: "../assets/richard_hendricks.png",
-              nameCopied: false
+              imageUrl: "../assets/richard_hendricks.png"
             },
             {
               id: "b7a29fdd-e34b-493c-bdf4-4f85d7868552",
               firstName: "Jared",
               lastName: "Woods",
               patronymicName: "Alekseevich",
-              imageUrl: "../assets/jared_woods.png",
-              nameCopied: false
+              imageUrl: "../assets/jared_woods.png"
             },
             {
               id: "b1f0d8c3-b609-4aaa-9bf6-5cdf48095cd0",
               firstName: "Gilfoyle",
               lastName: "Starr",
               patronymicName: "Olegovich",
-              imageUrl: "",
-              nameCopied: false
+              imageUrl: ""
             },
             {
               id: "726b8bd0-3ed3-45e6-b369-ffc87389ae7f",
               firstName: "Erlich",
               lastName: "Bachman",
               patronymicName: "Sergeevich",
-              imageUrl: "../assets/erlich_bachman.png",
-              nameCopied: false
+              imageUrl: "../assets/erlich_bachman.png"
             }
           ],
-          defaultImageUrl: "../assets/default.png",
           displayUsers: true
         },
         filters: {
@@ -178,16 +206,6 @@
         methods: {
           toggleUsersDisplay() {
             this.displayUsers = !this.displayUsers
-          },
-          fullName({ firstName, lastName, patronymicName }) {
-            return `${lastName} ${firstName} ${patronymicName}`
-          },
-          handleCopied(index) {
-            this.users[index].nameCopied = true
-            setTimeout(() => this.users[index].nameCopied = false, 1000)
-          },
-          nameCopied(index) {
-            return this.users[index].nameCopied
           }
         }
       })
