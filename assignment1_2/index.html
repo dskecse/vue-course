@@ -88,7 +88,7 @@
         </thead>
 
         <tbody>
-          <User v-for="user in users" :key="user.id" :user="user"></User>
+          <tr is="user" v-for="user in users" :key="user.id" :user="user"></tr>
         </tbody>
       </table>
     </div>
