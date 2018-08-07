@@ -113,7 +113,7 @@
       </tr>
     </script>
     <script>
-      const user = Vue.component("user", {
+      const User = {
         template: "#user-template",
         props: {
           user: {
@@ -142,10 +142,13 @@
             setTimeout(() => this.nameCopied = false, 1000)
           }
         }
-      })
+      }
 
       const app = new Vue({
         el: "#app",
+        components: {
+          User
+        },
         data: {
           header: "Pied Piper Team",
           users: [
