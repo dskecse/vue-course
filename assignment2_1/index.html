@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Assignment 2.1</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+
+      caption {
+        caption-side: top;
+      }
+
+      .tooltip {
+        display: block !important;
+        z-index: 10000;
+      }
+
+      .tooltip .tooltip-inner {
+        background: black;
+        color: white;
+        border-radius: 4px;
+        padding: 5px 6px 4px;
+      }
+
+      .tooltip[x-placement^="right"] {
+        margin-left: 5px;
+      }
+
+      .tooltip[aria-hidden="true"] {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity .15s, visibility .15s;
+      }
+
+      .tooltip[aria-hidden="false"] {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity .15s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container" v-cloak>
+      <h1 class="mt-5">{{ header }}</h1>
+
+      <p>
+        <button @click="toggleUsersDisplay" v-tooltip.right="tooltip" type="button" class="btn btn-primary">
+          {{ toggleButtonText }}
+        </button>
+      </p>
+
+      <user-list :users="users" :display-users="displayUsers"></user-list>
+    </div>
+
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/v-copy"></script>
+    <script src="https://unpkg.com/v-tooltip"></script>
+    <script type="text/x-template" id="user-list-template">
+      <table v-show="displayUsers" class="table table-striped">
+        <caption># of Team Members: {{ usersCount }}</caption>
+
+        <thead>
+          <tr>
+            <th></th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Patronymic Name</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr is="user" v-for="user in users" :key="user.id" :user="user"></tr>
+        </tbody>
+      </table>
+    </script>
+    <script type="text/x-template" id="user-template">
+      <tr>
+        <td>
+          <img :src="user.imageUrl || defaultImageUrl" alt="avatar">
+        </td>
+        <td>{{ user.firstName | uppercase }}</td>
+        <td>{{ user.lastName | uppercase }}</td>
+        <td>{{ user.patronymicName | uppercase }}</td>
+        <td>
+          <button v-copy="fullName" v-copy:callback="handleCopied" type="button" class="btn btn-outline-primary btn-sm">
+            Copy
+          </button>
+          <span v-show="nameCopied">Copied!</span>
+        </td>
+      </tr>
+    </script>
+    <script>
+      const User = {
+        template: "#user-template",
+        props: {
+          user: {
+            required: true
+          }
+        },
+        data() {
+          return {
+            nameCopied: false,
+            defaultImageUrl: "../assets/default.png"
+          }
+        },
+        filters: {
+          uppercase(value) {
+            return value.toUpperCase()
+          }
+        },
+        computed: {
+          fullName() {
+            return `${this.user.lastName} ${this.user.firstName} ${this.user.patronymicName}`
+          }
+        },
+        methods: {
+          handleCopied(text) {
+            this.nameCopied = true
+            setTimeout(() => this.nameCopied = false, 1000)
+          }
+        }
+      }
+
+      const UserList = {
+        template: "#user-list-template",
+        components: {
+          User
+        },
+        props: {
+          users: {
+            type: Array,
+            required: true
+          },
+          displayUsers: {
+            type: Boolean,
+            required: true
+          }
+        },
+        computed: {
+          usersCount() {
+            return this.users.length
+          }
+        }
+      }
+
+      const app = new Vue({
+        el: "#app",
+        components: {
+          UserList
+        },
+        data: {
+          header: "Pied Piper Team",
+          users: [],
+          displayUsers: true
+        },
+        mounted() {
+          this.loadUsers()
+        },
+        watch: {
+          users: "usersUpdated"
+        },
+        filters: {
+          uppercase(value) {
+            return value.toUpperCase()
+          }
+        },
+        computed: {
+          toggleButtonText() {
+            return this.displayUsers ? "Hide" : "Show"
+          },
+          tooltip() {
+            return `Click the button to ${this.toggleButtonText.toLowerCase()} team members list`
+          }
+        },
+        methods: {
+          toggleUsersDisplay() {
+            this.displayUsers = !this.displayUsers
+          },
+          loadUsers() {
+            this.users.push(
+              {
+                id: "ee56da42-3dff-493d-8b32-87c9d987348f",
+                firstName: "Russ",
+                lastName: "Hanneman",
+                patronymicName: "Ivanovich",
+                imageUrl: "../assets/russ_hanneman.png"
+              },
+              {
+                id: "203b8246-2772-45e0-aa38-9bf7304b489a",
+                firstName: "Richard",
+                lastName: "Hendricks",
+                patronymicName: "Igorevich",
+                imageUrl: "../assets/richard_hendricks.png"
+              },
+              {
+                id: "b7a29fdd-e34b-493c-bdf4-4f85d7868552",
+                firstName: "Jared",
+                lastName: "Woods",
+                patronymicName: "Alekseevich",
+                imageUrl: "../assets/jared_woods.png"
+              },
+              {
+                id: "b1f0d8c3-b609-4aaa-9bf6-5cdf48095cd0",
+                firstName: "Gilfoyle",
+                lastName: "Starr",
+                patronymicName: "Olegovich",
+                imageUrl: ""
+              },
+              {
+                id: "726b8bd0-3ed3-45e6-b369-ffc87389ae7f",
+                firstName: "Erlich",
+                lastName: "Bachman",
+                patronymicName: "Sergeevich",
+                imageUrl: "../assets/erlich_bachman.png"
+              }
+            )
+          },
+          usersUpdated() {
+            console.log("users changed: ", this.users)
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
