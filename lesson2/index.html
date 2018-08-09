@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Первое занятие по Vue!</h1>
+
+    <div id="app" v-cloak>
+      <p>
+        Screen width: {{ screenWidth }}
+      </p>
+
+      <p :title="tooltip">
+        Всего пользователей – {{ totalUsers }}
+      </p>
+
+      <users-table :list="users"
+                   :total="0"
+                   @remove-user="removeFromList"></users-table>
+
+      <button type="button" @click="add">
+        Add
+      </button>
+
+      <select v-model="selectedNumber">
+        <option v-for="number in numbers">{{ number }}</option>
+      </select>
+
+      <hr>
+
+      <button type="button" @click="change">
+        Set temp
+      </button>
+
+      <input type="text" v-model.trim="temp">
+    </div>
+
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <script type="text/x-template" id="users-table">
+      <div>
+        <p>User List</p>
+
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>firstName</th>
+              <th>lastName</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in list" :key="item.id">
+              <td>{{ item.firstName }}</td>
+              <td>{{ item.lastName }}</td>
+              <td>
+                <button type="button" @click="removeUser(item.id)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </script>
+    <script>
+      const UsersTable = {
+        template: "#users-table",
+        props: {
+          list: {
+            type: Array,
+            required: true
+          },
+          total: {
+            type: Number,
+            default: 15
+          }
+        },
+        methods: {
+          test() {
+            console.log(this.list, this.total)
+          },
+          removeUser(id) {
+            this.$emit("remove-user", id)
+          }
+        }
+      }
+
+      const app = new Vue({
+        el: "#app",
+        components: {
+          "users-table": UsersTable
+        },
+        data() {
+          return {
+            numbers: [1, 2, 3],
+            selectedNumber: 2,
+            temp: "Тестовая строка",
+            tooltip: "I'M A HINT",
+            condition: false,
+            users: [],
+            testHtml: "<hr>",
+            testClass: "red",
+            screenWidth: window.outerWidth
+          }
+        },
+        mounted() {
+          this.loadUsers()
+
+          window.addEventListener("resize", () => {
+            this.screenWidth = window.outerWidth
+          })
+        },
+        // beforeDestroyed() {
+        //   window.removeEventListener("resize")
+        // },
+        computed: {
+          totalUsers() {
+            return this.users.length
+          },
+          filteredUsers() {
+            return this.users.filter((item, index) => index > 2)
+          }
+        },
+        watch: {
+          users: {
+            // deep: true,
+            immediate: true,
+            handler: "usersUpdated"
+          }
+        },
+        methods: {
+          removeFromList(id) {
+            this.users = this.users.filter(item => item.id !== id)
+          },
+          usersUpdated() {
+            console.log("users watch", this.users)
+          },
+          add() {
+            this.users.push({
+              id: 4,
+              firstName: "Erlich",
+              lastName: "Bachman",
+              patronymicName: "Sergeevich",
+              imageUrl: "../assets/erlich_bachman.png"
+            })
+          },
+          change() {
+            this.condition = !this.condition
+          },
+          loadUsers() {
+            this.users = [
+              {
+                id: 0,
+                firstName: "Russ",
+                lastName: "Hanneman",
+                patronymicName: "Ivanovich",
+                imageUrl: "../assets/russ_hanneman.png"
+              },
+              {
+                id: 1,
+                firstName: "Richard",
+                lastName: "Hendricks",
+                patronymicName: "Igorevich",
+                imageUrl: "../assets/richard_hendricks.png"
+              },
+              {
+                id: 2,
+                firstName: "Jared",
+                lastName: "Woods",
+                patronymicName: "Alekseevich",
+                imageUrl: "../assets/jared_woods.png"
+              },
+              {
+                id: 3,
+                firstName: "Gilfoyle",
+                lastName: "Starr",
+                patronymicName: "Alexandrovich",
+                imageUrl: ""
+              }
+            ]
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
