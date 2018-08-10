@@ -100,6 +100,7 @@
         template: "#user-template",
         props: {
           user: {
+            type: Object,
             required: true
           }
         },
@@ -111,6 +112,7 @@
         },
         filters: {
           uppercase(value) {
+            if (!value) return ""
             return value.toUpperCase()
           }
         },
@@ -154,10 +156,12 @@
         components: {
           UserList
         },
-        data: {
-          header: "Pied Piper Team",
-          users: [],
-          displayUsers: true
+        data() {
+          return {
+            header: "Pied Piper Team",
+            users: [],
+            displayUsers: true
+          }
         },
         mounted() {
           this.loadUsers()

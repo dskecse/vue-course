@@ -21,7 +21,7 @@
     <div id="app" class="container" v-cloak>
       <h1 class="mt-5">{{ header }}</h1>
 
-      <user-form :user="user" @update-user="updateUser"></user-form>
+      <user-form v-if="user" :user="user" @update-user="updateUser"></user-form>
     </div>
 
     <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
@@ -52,17 +52,18 @@
         template: "#user-form-template",
         props: {
           user: {
+            type: Object,
             required: true
           }
         },
         data() {
           return {
-            formData: {},
+            formData: null,
             defaultImageUrl: "../assets/default.png"
           }
         },
-        watch: {
-          user: "userChanged"
+        created() {
+          this.formData = Object.assign({}, this.user)
         },
         methods: {
           saveChanges() {
@@ -74,9 +75,6 @@
               this.formData.imageUrl = e.target.result
             }
             reader.readAsDataURL(e.target.files[0])
-          },
-          userChanged() {
-            this.formData = Object.assign({}, this.user)
           }
         }
       }
@@ -86,9 +84,11 @@
         components: {
           UserForm
         },
-        data: {
-          header: "Edit User",
-          user: {}
+        data() {
+          return {
+            header: "Edit User",
+            user: null
+          }
         },
         mounted() {
           this.loadUser()
