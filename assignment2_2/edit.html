@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Assignment 2.2</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+
+      form img {
+        width: 126px;
+        height: 126px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container" v-cloak>
+      <h1 class="mt-5">{{ header }}</h1>
+
+      <div v-if="errored" class="alert alert-danger">User could not be loaded.</div>
+      <template v-else>
+        <div v-if="loading" class="alert alert-primary">Loading...</div>
+        <user-form v-else :user="user" @update-user="updateUser"></user-form>
+      </template>
+    </div>
+
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/x-template" id="user-form-template">
+      <form @submit.prevent="saveChanges">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input v-model="formData.firstName" type="text" id="firstName" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input v-model="formData.lastName" type="text" id="lastName" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="picture">Avatar</label>
+          <input @change="handlePictureUpdate" type="file" id="picture" class="form-control-file">
+          <img :src="formData.picture || defaultPicture" alt="avatar">
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </script>
+    <script>
+      const UserForm = {
+        template: "#user-form-template",
+        props: {
+          user: {
+            type: Object,
+            required: true
+          }
+        },
+        data() {
+          return {
+            formData: null,
+            defaultPicture: "../assets/default.png"
+          }
+        },
+        created() {
+          this.formData = Object.assign({}, this.user)
+        },
+        methods: {
+          saveChanges() {
+            this.$emit("update-user", this.formData)
+          },
+          handlePictureUpdate(e) {
+            let reader = new FileReader()
+            reader.onload = e => {
+              this.formData.picture = e.target.result
+            }
+            reader.readAsDataURL(e.target.files[0])
+          }
+        }
+      }
+
+      const app = new Vue({
+        el: "#app",
+        components: {
+          UserForm
+        },
+        data() {
+          return {
+            header: "Edit User",
+            user: null,
+            loading: true,
+            errored: false
+          }
+        },
+        mounted() {
+          this.loadUser(this.userId)
+        },
+        computed: {
+          userId() {
+            let params = new URLSearchParams(window.location.search)
+            return params.get("user_id")
+          }
+        },
+        methods: {
+          loadUser(id) {
+            axios
+              .get(`http://localhost:3000/users/${id}`)
+              .then(response => (this.user = response.data))
+              .catch(error => {
+                console.log(error)
+                this.errored = true
+              })
+              .finally(() => (this.loading = false))
+          },
+          updateUser(user) {
+            axios
+              .put(`http://localhost:3000/users/${this.userId}`, { ...user })
+              .catch(error => console.log(error))
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
