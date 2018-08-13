@@ -117,8 +117,7 @@
         },
         filters: {
           uppercase(value) {
-            if (!value) return ""
-            return value.toUpperCase()
+            return (!value ? "" : value.toUpperCase())
           }
         },
         computed: {

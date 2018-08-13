@@ -22,10 +22,8 @@
       <h1 class="mt-5">{{ header }}</h1>
 
       <div v-if="errored" class="alert alert-danger">User could not be loaded.</div>
-      <template v-else>
-        <div v-if="loading" class="alert alert-primary">Loading...</div>
-        <user-form v-else :user="user" @update-user="updateUser"></user-form>
-      </template>
+      <div v-else-if="loading" class="alert alert-primary">Loading...</div>
+      <user-form v-else :user="user" @update-user="updateUser"></user-form>
     </div>
 
     <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
@@ -94,18 +92,21 @@
           }
         },
         mounted() {
-          this.loadUser(this.userId)
+          this.loadUser()
         },
         computed: {
           userId() {
             let params = new URLSearchParams(window.location.search)
             return params.get("user_id")
+          },
+          editUserUrl() {
+            return `http://localhost:3000/users/${this.userId}`
           }
         },
         methods: {
-          loadUser(id) {
+          loadUser() {
             axios
-              .get(`http://localhost:3000/users/${id}`)
+              .get(this.editUserUrl)
               .then(response => (this.user = response.data))
               .catch(error => {
                 console.log(error)
@@ -115,7 +116,7 @@
           },
           updateUser(user) {
             axios
-              .put(`http://localhost:3000/users/${this.userId}`, { ...user })
+              .put(this.editUserUrl, { ...user })
               .catch(error => console.log(error))
           }
         }
