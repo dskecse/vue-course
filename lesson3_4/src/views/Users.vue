@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>User List</h2>
+    <h2 class="cool">User List</h2>
 
     <div v-if="loading" class="alert alert-warning">
       Loading...
@@ -18,11 +18,11 @@
 
 <script>
 import axios from 'axios'
-import UserList from '@/components/UserList.vue'
+// import UserList from '@/components/UserList.vue'
 
 export default {
   components: {
-    UserList
+    UserList: () => import('@/components/UserList.vue')
   },
   data() {
     return {
@@ -46,3 +46,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.cool {
+  color: red;
+}
+</style>

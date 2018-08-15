@@ -29,6 +29,8 @@
     </nav>
 
     <main role="main" class="container">
+      <h2 class="cool">Header from the Template</h2>
+      <hr>
       <router-view/>
     </main>
 
